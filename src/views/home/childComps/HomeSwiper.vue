@@ -23,9 +23,6 @@ export default {
 </script>
 
 <style scoped>
-.swipe {
-  height: 160px;
-}
 .swipe-item {
   width: 100%;
   height: 100%;

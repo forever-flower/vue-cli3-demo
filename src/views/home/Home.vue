@@ -5,30 +5,39 @@
         <div>购物街</div>
       </template>
     </nav-bar>
-    <home-swiper :banners="banners"/>
-    <recommend-view :recommends="recommends"/>
-    <tab-control :titles="['流行', '新款', '精选']" @tabClick="tabClick"/>
-    <goods-list :goods="showGoods"/>
+    <!-- <scroll class="content"> -->
+    <div class="content" ref="content">
+      <home-swiper :banners="banners"/>
+      <recommend-view :recommends="recommends"/>
+      <tab-control :titles="['流行', '新款', '精选']" @tabClick="tabClick"/>
+      <goods-list :goods="showGoods"/>
+    </div>
+    <!-- </scroll> -->
+    <back-top @click="backClick" v-show="isShowBackTop"/>
   </div>
 </template>
 
 <script>
 import NavBar from 'components/common/navbar/NavBar.vue'
+// import Scroll from 'components/common/scroll/Scroll.vue'
 import TabControl from 'components/content/tabControl/TabControl.vue'
 import GoodsList from 'components/content/goods/GoodsList.vue'
+import BackTop from 'components/content/backTop/BackTop.vue'
 import HomeSwiper from './childComps/HomeSwiper.vue'
 import RecommendView from './childComps/RecommendView.vue'
 import {
   getHomeMultidata,
   getHomeGoods
-} from 'network/home.js'
+} from 'network/home'
 
 export default {
   name: 'Home',
   components: {
     NavBar,
+    // Scroll,
     TabControl,
     GoodsList,
+    BackTop,
     HomeSwiper,
     RecommendView,
   },
@@ -52,6 +61,38 @@ export default {
               title: '1',
               show: {
                 img: '~assets/imgs/home/2.png'
+              },
+              price: '90',
+              cfav: 30
+            },
+            {
+              title: '1',
+              show: {
+                img: '~assets/imgs/home/3.png'
+              },
+              price: '90',
+              cfav: 30
+            },
+            {
+              title: '1',
+              show: {
+                img: '~assets/imgs/home/4.png'
+              },
+              price: '90',
+              cfav: 30
+            },
+            {
+              title: '1',
+              show: {
+                img: '~assets/imgs/home/3.png'
+              },
+              price: '90',
+              cfav: 30
+            },
+            {
+              title: '1',
+              show: {
+                img: '~assets/imgs/home/4.png'
               },
               price: '90',
               cfav: 30
@@ -125,7 +166,8 @@ export default {
           ]
         }
       },
-      currentType: 'pop'
+      currentType: 'pop',
+      isShowBackTop: false
     }
   },
   computed: {
@@ -139,7 +181,30 @@ export default {
     // this.getHomeGoods('new')
     // this.getHomeGoods('sell')
   },
+  mounted() {
+    window.addEventListener('scroll', this.scrollChange, true)
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.scrollChange, true)
+  },
   methods: {
+    scrollChange() {
+      let topHeight = window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop
+      if(topHeight > 300) {
+        this.isShowBackTop = true
+      } else {
+        this.isShowBackTop = false
+      }
+      // 文档流高度
+      let documentHeight = document.documentElement.clientHeight
+      // bodyHeight 窗口的可视高度
+      let bodyHeight = document.body.clientHeight
+      if(topHeight + bodyHeight >= documentHeight){
+        console.log('上拉加载更多')
+      }
+    },
     getHomeMultidata() {
       getHomeMultidata().then(res => {
         this.banners = res.data.banner.list
@@ -165,6 +230,9 @@ export default {
           this.currentType = 'sell'
           break
       }
+    },
+    backClick() {
+      scrollTo(0, 0)
     }
   }
 }
@@ -173,6 +241,8 @@ export default {
 <style scope>
 #home {
   padding-top: 44px;
+  height: 100vh;
+  position: relative;
 }
 .home-nav {
   background-color: var(--color-tint);
@@ -182,5 +252,18 @@ export default {
   right: 0;
   top: 0;
   z-index: 9;
+}
+.content {
+  /* overflow: hidden;
+  position: absolute;
+  top: 21px;
+  bottom: 49px;
+  left: 0;
+  right: 0; */
+}
+.content {
+  /* height: calc(100% - 93px);
+  overflow: hidden;
+  margin-top: 44px; */
 }
 </style>
