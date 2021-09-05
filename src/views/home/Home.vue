@@ -5,11 +5,17 @@
         <div>购物街</div>
       </template>
     </nav-bar>
+    <tab-control :titles="['流行', '新款', '精选']" 
+        @tabClick="tabClick"
+        class="fixed"
+        ref="tabControl1" v-show="isTabFixed"/>
     <!-- <scroll class="content"> -->
     <div class="content" ref="content">
-      <home-swiper :banners="banners"/>
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
       <recommend-view :recommends="recommends"/>
-      <tab-control :titles="['流行', '新款', '精选']" @tabClick="tabClick"/>
+      <tab-control :titles="['流行', '新款', '精选']" 
+        @tabClick="tabClick" 
+        ref="tabControl2"/>
       <goods-list :goods="showGoods"/>
     </div>
     <!-- </scroll> -->
@@ -167,7 +173,9 @@ export default {
         }
       },
       currentType: 'pop',
-      isShowBackTop: false
+      isShowBackTop: false,
+      tabOffsetTop: 0,
+      isTabFixed: false
     }
   },
   computed: {
@@ -187,7 +195,16 @@ export default {
   beforeUnmount() {
     window.removeEventListener('scroll', this.scrollChange, true)
   },
+  activated() {
+    console.log('activated')
+  },
+  deactivated() {
+    console.log('deactivated')
+  },
   methods: {
+    swiperImageLoad() {
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
+    },
     scrollChange() {
       let topHeight = window.pageYOffset ||
         document.documentElement.scrollTop ||
@@ -203,6 +220,22 @@ export default {
       let bodyHeight = document.body.clientHeight
       if(topHeight + bodyHeight >= documentHeight){
         console.log('上拉加载更多')
+      }
+      // 吸顶效果
+      if(topHeight > this.tabOffsetTop) {
+        this.isTabFixed = true
+      } else {
+        this.isTabFixed = false
+      }
+    },
+    // 防抖动函数
+    debounce(func, delay) {
+      let timer = null
+      return function(...args) {
+        if(timer) clearTimeout(timer)
+        timer = setTimeout(() => {
+          func.apply(this, args)
+        }, delay)
       }
     },
     getHomeMultidata() {
@@ -230,6 +263,8 @@ export default {
           this.currentType = 'sell'
           break
       }
+      this.$refs.tabControl1.currentIndex = index
+      this.$refs.tabControl2.currentIndex = index
     },
     backClick() {
       scrollTo(0, 0)
@@ -265,5 +300,13 @@ export default {
   /* height: calc(100% - 93px);
   overflow: hidden;
   margin-top: 44px; */
+}
+.fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 44px;
+  z-index: 10;
+  background-color: #fff;
 }
 </style>

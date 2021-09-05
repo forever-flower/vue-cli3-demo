@@ -2,7 +2,7 @@
   <var-swipe class="swipe" :autoplay="2000">
     <var-swipe-item v-for="(item, index) in banners" :key="index">
       <a :href="item.link">
-        <img class="swipe-item" :src="item.image923"/>
+        <img class="swipe-item" :src="item.image923" @load="imageLoad"/>
       </a>
     </var-swipe-item>
   </var-swipe>
@@ -16,6 +16,19 @@ export default {
       type: Array,
       default() {
         return []
+      }
+    }
+  },
+  data() {
+    return {
+      isLoad: false
+    }
+  },
+  methods: {
+    imageLoad() {
+      if(!this.isLoad) {
+        this.$emit('swiperImageLoad')
+        this.isLoad = true
       }
     }
   }
