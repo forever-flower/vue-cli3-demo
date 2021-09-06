@@ -17,7 +17,8 @@ export default {
   display: flex;
   line-height: 44px;
   text-align: center;
-  background-color:burlywood;
+  background-color:#fff;
+  border-bottom: 1px solid #ddd;
 }
 .left, .right {
   width: 60px;
